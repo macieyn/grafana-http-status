@@ -1,0 +1,35 @@
+version: "3"
+
+networks:
+  grafana:
+  influxdb:
+
+volumes:
+  app_data: {}
+
+services:
+  grafana:
+    image: grafana/grafana:7.3.6
+    ports:
+      - 3000:3000
+    networks:
+      - grafana
+  
+  telegraf:
+    image: telegraf
+    networks: 
+      - grafana
+      - influxdb
+    volumes:
+    - ./http_resonse.conf:/etc/telegraf/telegraf.d/http_resonse.conf
+    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+
+  influxdb:
+    image: influxdb
+    ports:
+      - 8086:8086
+    networks:
+      - grafana
+      - influxdb
+    environment:
+      - INFLUXDB_DB=influxdb
